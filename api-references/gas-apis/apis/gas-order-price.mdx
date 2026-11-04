@@ -8,7 +8,7 @@ description: "获取下单价格"
   资源类型,默认为"energy"。例:"energy"或"net"
 </ParamField>
 <ParamField query="service_charge_type" type="string">
-  租赁周期:不填返回所有支持的租赁信息。`10000` 表示能量速充，分钟:10010-10分钟,小时:20001-1小时,天:30001-1天。
+  租赁周期:不填返回所有支持的租赁信息。`10000` 表示能量或带宽速充，分钟:10010-10分钟,小时:20001-1小时,天:30001-1天。
 </ParamField>
 
 #### 响应参数数据结构
@@ -21,7 +21,7 @@ description: "获取下单价格"
         价格列表
         <Expandable title="object">
             <ResponseField name="expire_min" type="integer">过期分钟数</ResponseField>
-            <ResponseField name="service_charge_type" type="string">服务费类型code，`10000` 表示能量速充</ResponseField>
+            <ResponseField name="service_charge_type" type="string">服务费类型code，`10000` 表示能量或带宽速充</ResponseField>
             <ResponseField name="price" type="decimal">价格</ResponseField>
             <ResponseField name="remaining_number" type="long">剩余可租赁数量</ResponseField>
         </Expandable>

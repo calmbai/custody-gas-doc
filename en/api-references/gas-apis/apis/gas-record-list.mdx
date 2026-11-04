@@ -26,7 +26,7 @@ description: "Retrieve specific order records through ID"
     Status: `0` Order creation successful, `1` Proxy resource successful, `2` Proxy resource failed, `3` partially successful, `10` Recycling successful
   </ResponseField>
   <ResponseField name="service_charge_type" type="string">
-    Service charge type. Energy flash recharge always uses `10000`.
+    Service charge type. Energy and bandwidth flash recharge both use `10000`.
   </ResponseField>
   <ResponseField name="receive_address" type="string">
     resource receive address
@@ -108,9 +108,9 @@ description: "Retrieve specific order records through ID"
     </Expandable>
   </ResponseField>
   <ResponseField name="swap_info" type="object">
-    Energy flash recharge information. This field is returned only for flash recharge orders and is omitted for regular orders.
+    Energy or bandwidth flash recharge information. This field is returned only for flash recharge orders and is omitted for regular orders.
     <Expandable title="object">
-      <ResponseField name="address" type="string">Energy receiving address</ResponseField>
+      <ResponseField name="address" type="string">Resource receiving address</ResponseField>
       <ResponseField name="energy_used" type="integer">Energy used before flash recharge</ResponseField>
       <ResponseField name="energy_num" type="integer">Available energy before flash recharge</ResponseField>
       <ResponseField name="buy_energy_num" type="integer">Energy quantity originally purchased by the user</ResponseField>
@@ -118,12 +118,54 @@ description: "Retrieve specific order records through ID"
       <ResponseField name="end_energy_used" type="integer">Energy used after reclaim is complete</ResponseField>
       <ResponseField name="end_energy_num" type="integer">Available energy after reclaim is complete</ResponseField>
       <ResponseField name="freeze_energy_num" type="integer">Energy base used for the initial lock</ResponseField>
+      <ResponseField name="net_used" type="integer">Staked bandwidth used before recharge, excluding free bandwidth</ResponseField>
+      <ResponseField name="net_num" type="integer">Staked bandwidth available before recharge, excluding free bandwidth; not the purchased quantity</ResponseField>
+      <ResponseField name="buy_net_num" type="integer">Bandwidth quantity originally purchased by the user</ResponseField>
+      <ResponseField name="send_net_num" type="integer">Bandwidth actually delegated; not the final billed quantity</ResponseField>
+      <ResponseField name="end_net_used" type="integer">Staked bandwidth used after reclaim, excluding free bandwidth</ResponseField>
+      <ResponseField name="end_net_num" type="integer">Staked bandwidth available after reclaim, excluding free bandwidth</ResponseField>
+      <ResponseField name="freeze_net_num" type="integer">Bandwidth base used for the initial fund lock; not the final billed quantity</ResponseField>
       <ResponseField name="freeze_amount" type="string">Initially locked amount in TRX</ResponseField>
       <ResponseField name="current_lock_amount" type="string">Current locked amount in TRX</ResponseField>
-      <ResponseField name="settlement_amount" type="string">Final settlement amount in TRX, calculated from the final billed energy quantity confirmed by the system after reclaim, using the price and fee-rate snapshot taken at order time</ResponseField>
+      <ResponseField name="settlement_amount" type="string">Final settlement amount in TRX, calculated from the final billed resource quantity confirmed by the system after reclaim, using the price and fee-rate snapshot taken at order time</ResponseField>
     </Expandable>
   </ResponseField>
 </Expandable>
+
+#### Settled Bandwidth Flash Recharge Example (Excerpt)
+
+```json
+{
+  "code": 0,
+  "msg": "Success",
+  "data": [
+    {
+      "trade_no": "GAS_FLASH_NET_EXAMPLE",
+      "request_id": "flash_net_001",
+      "status": 10,
+      "service_charge_type": "10000",
+      "receive_address": "YOUR_TRON_ADDRESS",
+      "amount": "0.3",
+      "energy_num": 0,
+      "net_num": 1000,
+      "swap_info": {
+        "address": "YOUR_TRON_ADDRESS",
+        "net_used": 8000,
+        "net_num": 2000,
+        "buy_net_num": 1000,
+        "send_net_num": 1429,
+        "freeze_net_num": 1572,
+        "end_net_used": 7000,
+        "end_net_num": 3000,
+        "freeze_amount": "0.4716",
+        "current_lock_amount": "0",
+        "settlement_amount": "0.3",
+        "settlement_status": 3
+      }
+    }
+  ]
+}
+```
 
 <RequestExample>
   ```curl cURL

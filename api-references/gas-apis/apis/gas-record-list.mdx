@@ -26,7 +26,7 @@ description: "通过id获取特定的代理记录"
     状态：`0` 创建订单成功,  `1` 代理资源成功,  `2` 代理资源失败, `3` 部分成功, `10` 回收成功
   </ResponseField>
   <ResponseField name="service_charge_type" type="string">
-    服务费类型。能量速充固定为 `10000`。
+    服务费类型。能量和带宽速充均固定为 `10000`。
   </ResponseField>
   <ResponseField name="receive_address" type="string">
     资源接收地址
@@ -108,7 +108,7 @@ description: "通过id获取特定的代理记录"
     </Expandable>
   </ResponseField>
   <ResponseField name="swap_info" type="object">
-    能量速充信息，仅速充订单返回；普通订单不返回该字段。
+    能量或带宽速充信息，仅速充订单返回；普通订单不返回该字段。
     <Expandable title="object">
       <ResponseField name="address" type="string">速充接收地址</ResponseField>
       <ResponseField name="energy_used" type="integer">速充前已使用能量</ResponseField>
@@ -118,12 +118,54 @@ description: "通过id获取特定的代理记录"
       <ResponseField name="end_energy_used" type="integer">回收完成后已使用能量</ResponseField>
       <ResponseField name="end_energy_num" type="integer">回收完成后可用能量</ResponseField>
       <ResponseField name="freeze_energy_num" type="integer">首次冻结采用的能量基数</ResponseField>
+      <ResponseField name="net_used" type="integer">速充前已使用质押带宽，不含免费带宽</ResponseField>
+      <ResponseField name="net_num" type="integer">速充前可用质押带宽，不含免费带宽；不是本单购买量</ResponseField>
+      <ResponseField name="buy_net_num" type="integer">用户原始购买带宽数量</ResponseField>
+      <ResponseField name="send_net_num" type="integer">实际代理带宽数量，不代表最终计费数量</ResponseField>
+      <ResponseField name="end_net_used" type="integer">回收完成后已使用质押带宽，不含免费带宽</ResponseField>
+      <ResponseField name="end_net_num" type="integer">回收完成后可用质押带宽，不含免费带宽</ResponseField>
+      <ResponseField name="freeze_net_num" type="integer">首次冻结采用的带宽基数，不代表最终计费数量</ResponseField>
       <ResponseField name="freeze_amount" type="string">首次冻结金额，单位TRX</ResponseField>
       <ResponseField name="current_lock_amount" type="string">当前剩余冻结金额，单位TRX</ResponseField>
-      <ResponseField name="settlement_amount" type="string">最终结算金额，单位TRX。按回收完成后系统确认的最终计费能量数量与下单时的价格、费率快照计算</ResponseField>
+      <ResponseField name="settlement_amount" type="string">最终结算金额，单位TRX。按回收完成后系统确认的最终资源计费数量与下单时的价格、费率快照计算</ResponseField>
     </Expandable>
   </ResponseField>
 </Expandable>
+
+#### 带宽速充已结算示例（节选）
+
+```json
+{
+  "code": 0,
+  "msg": "Success",
+  "data": [
+    {
+      "trade_no": "GAS_FLASH_NET_EXAMPLE",
+      "request_id": "flash_net_001",
+      "status": 10,
+      "service_charge_type": "10000",
+      "receive_address": "YOUR_TRON_ADDRESS",
+      "amount": "0.3",
+      "energy_num": 0,
+      "net_num": 1000,
+      "swap_info": {
+        "address": "YOUR_TRON_ADDRESS",
+        "net_used": 8000,
+        "net_num": 2000,
+        "buy_net_num": 1000,
+        "send_net_num": 1429,
+        "freeze_net_num": 1572,
+        "end_net_used": 7000,
+        "end_net_num": 3000,
+        "freeze_amount": "0.4716",
+        "current_lock_amount": "0",
+        "settlement_amount": "0.3",
+        "settlement_status": 3
+      }
+    }
+  ]
+}
+```
 
 <RequestExample>
   ```curl cURL

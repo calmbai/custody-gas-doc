@@ -1,16 +1,16 @@
 ---
-title: Energy Flash Recharge
+title: Energy / Bandwidth Flash Recharge
 api: POST /api/tron/gas/flash/open
-description: "Create a TRON energy flash recharge order"
+description: "Create a TRON energy or bandwidth flash recharge order"
 ---
 
-Energy flash recharge always uses `service_charge_type=10000`. Do not pass `service_charge_type` in the request.
+Flash recharge always uses `service_charge_type=10000`. Do not pass `service_charge_type` in the request.
 
 <Note>
-  - Only activated TRON addresses that meet the flash recharge rules are supported. Orders are rejected if the purchased quantity is too low or the address's current energy status does not qualify.
+  - Only activated TRON addresses that meet the flash recharge rules are supported. Orders are rejected if the purchased quantity is too low or the address's current resource status does not qualify.
   - Orders are processed asynchronously. A `trade_no` is returned once the local order is created and the funds are locked. Order progress and settlement details are available in the `swap_info` field of the [record list](/api-references/gas-apis/apis/gas-record-list) endpoint.
-  - **Fund locking**: When the order is created, a fee is locked based on the estimated actual delegated energy plus a safety margin, using the energy price and user fee rate at order time. The locked amount may be slightly higher than the fee estimated from `energy_num`.
-  - **Settlement**: After the energy is reclaimed, the actual fee is calculated from the final billed energy quantity confirmed by the system, using the price and fee-rate snapshot taken at order time. The fee is deducted from the locked amount, and the remainder is automatically unlocked back to the available balance.
+  - **Fund locking**: When the order is created, a fee is locked based on the estimated actual delegated resource quantity plus a safety margin, using the resource price and user fee rate at order time. The locked amount may be slightly higher than the fee estimated from the purchased quantity.
+  - **Settlement**: After the resource is reclaimed, the actual fee is calculated from the final billed resource quantity confirmed by the system, using the price and fee-rate snapshot taken at order time. The fee is deducted from the locked amount, and the remainder is automatically unlocked back to the available balance.
   - **Order failure**: The entire locked amount is unlocked back to the available balance and no fee is charged.
 </Note>
 
@@ -20,11 +20,29 @@ Energy flash recharge always uses `service_charge_type=10000`. Do not pass `serv
   Unique business request ID. It cannot be reused under the same account.
 </ParamField>
 <ParamField query="receive_address" type="string" required>
-  Address receiving the energy. Only one address is supported.
+  Address receiving the resource. Only one address is supported.
 </ParamField>
-<ParamField query="energy_num" type="integer" required>
-  Energy quantity purchased by the user. Final billing is based on the actual billed energy quantity confirmed by the system after reclaim, which may differ slightly from the purchased quantity. See `swap_info` in the record list endpoint for settlement details.
+<ParamField query="resource_type" type="integer" default="1">
+  `1`: energy; `2`: bandwidth. Defaults to `1` when omitted. `0` is not supported.
 </ParamField>
+<ParamField query="energy_num" type="integer">
+  Energy quantity. Required and positive for energy recharge; omit or pass `0` for bandwidth recharge. Final billing uses the quantity confirmed after reclaim.
+</ParamField>
+<ParamField query="net_num" type="integer">
+  Bandwidth quantity. Required and positive for bandwidth recharge; omit or pass `0` for energy recharge. Nonzero quantities for both resources are not allowed in one order.
+</ParamField>
+
+#### Bandwidth Request Parameters Before Encryption
+
+```json
+{
+  "request_id": "flash_net_001",
+  "receive_address": "YOUR_TRON_ADDRESS",
+  "resource_type": 2,
+  "net_num": 1000
+}
+```
+
 #### Response Parameters
 
 <Expandable title="object">

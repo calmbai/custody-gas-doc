@@ -1,16 +1,16 @@
 ---
-title: 能量速充
+title: 能量/带宽速充
 api: POST /api/tron/gas/flash/open
-description: "创建TRON能量速充订单"
+description: "创建TRON能量或带宽速充订单"
 ---
 
-能量速充固定使用 `service_charge_type=10000`，无需传入 `service_charge_type`。
+速充固定使用 `service_charge_type=10000`，无需传入 `service_charge_type`。
 
 <Note>
-  - 仅支持已激活且满足速充规则的TRON地址；购买数量过低或地址当前能量状态不满足速充条件时，下单会被拒绝。
+  - 仅支持已激活且满足速充规则的TRON地址；购买数量过低或地址当前资源状态不满足速充条件时，下单会被拒绝。
   - 订单采用异步处理模式，本地订单创建并完成资金冻结后立即返回 `trade_no`；后续进度与结算明细可通过 [查询记录](/api-references/gas-apis/apis/gas-record-list) 接口的 `swap_info` 字段查询。
-  - **资金冻结**：下单时按预估实际代理能量数量上浮一定安全余量，结合下单时的能量单价与用户费率冻结费用，冻结金额可能略高于按 `energy_num` 估算的费用。
-  - **费用结算**：能量回收完成后，按系统最终确认的实际计费能量数量与下单时的价格、费率快照计算实际费用，从冻结金额中扣除，剩余部分自动解冻返还可用余额。
+  - **资金冻结**：下单时按预估实际代理资源数量上浮一定安全余量，结合下单时的资源单价与用户费率冻结费用，冻结金额可能略高于按购买数量估算的费用。
+  - **费用结算**：资源回收完成后，按系统最终确认的实际计费资源数量与下单时的价格、费率快照计算实际费用，从冻结金额中扣除，剩余部分自动解冻返还可用余额。
   - **订单失败**：冻结金额全额解冻返还可用余额，不产生任何费用。
 </Note>
 
@@ -20,11 +20,29 @@ description: "创建TRON能量速充订单"
   业务方唯一请求ID。同一账户下不可重复。
 </ParamField>
 <ParamField query="receive_address" type="string" required>
-  能量接收地址，只支持单个地址。
+  资源接收地址，只支持单个地址。
 </ParamField>
-<ParamField query="energy_num" type="integer" required>
-  用户购买的能量数量。最终计费以回收完成后系统确认的实际计费能量数量为准，可能与购买数量存在少量偏差，可通过查询记录接口的 `swap_info` 查看结算明细。
+<ParamField query="resource_type" type="integer" default="1">
+  `1`：能量速充；`2`：带宽速充。不传默认 `1`，不支持 `0`。
 </ParamField>
+<ParamField query="energy_num" type="integer">
+  购买的能量数量。能量速充时必填且为正整数；带宽速充时不传或传 `0`。最终计费以回收后确认的数量为准。
+</ParamField>
+<ParamField query="net_num" type="integer">
+  购买的带宽数量。带宽速充时必填且为正整数；能量速充时不传或传 `0`。不能同时传入两种资源的非零购买量。
+</ParamField>
+
+#### 带宽速充加密前请求参数示例
+
+```json
+{
+  "request_id": "flash_net_001",
+  "receive_address": "YOUR_TRON_ADDRESS",
+  "resource_type": 2,
+  "net_num": 1000
+}
+```
+
 #### 响应参数数据结构
 
 <Expandable title="object">

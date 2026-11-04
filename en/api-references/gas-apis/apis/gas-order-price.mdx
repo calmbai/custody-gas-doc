@@ -10,7 +10,7 @@ description: "Get Price"
   Resource type, defaults to "energy". Examples: "energy" or "net"
 </ParamField>
 <ParamField query="service_charge_type" type="string">
-  Service charge type. If omitted, all supported types are returned. `10000` represents energy flash recharge; `10010` represents 10 minutes, `20001` represents 1 hour, and `30001` represents 1 day.
+  Service charge type. If omitted, all supported types are returned. `10000` represents energy or bandwidth flash recharge; `10010` represents 10 minutes, `20001` represents 1 hour, and `30001` represents 1 day.
 </ParamField>
 
 #### Response Parameters
@@ -23,7 +23,7 @@ description: "Get Price"
         price list
         <Expandable title="object">
             <ResponseField name="expire_min" type="integer">expire min</ResponseField>
-            <ResponseField name="service_charge_type" type="string">Service charge type code; `10000` represents energy flash recharge</ResponseField>
+            <ResponseField name="service_charge_type" type="string">Service charge type code; `10000` represents energy or bandwidth flash recharge</ResponseField>
             <ResponseField name="price" type="decimal">price</ResponseField>
             <ResponseField name="remaining_number" type="long">remaining number</ResponseField>
         </Expandable>
